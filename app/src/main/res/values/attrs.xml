@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+     <declare-styleable name="DigitalView">
+        <attr name="digitalImg" format="integer" />
+        <attr name="bit" format="integer" />
+    </declare-styleable>
+</resources>
