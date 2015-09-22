@@ -3,6 +3,7 @@
      <declare-styleable name="DigitalView">
         <attr name="digital_img" format="integer" />
         <attr name="bit" format="integer" />
+        <attr name="decimal_bit" format="integer" />
         <attr name="animate_duration" format="integer" />
     </declare-styleable>
 </resources>

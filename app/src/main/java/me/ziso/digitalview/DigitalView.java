@@ -5,48 +5,58 @@ import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 
 public class DigitalView extends LinearLayout {
-  public static final int DEFAULT_BIT = 5;
-  private int mDigitalBit;
-  private long mDuration;
+  public static final String TAG = "DigitalView";
+
+  public static final int DEFAULT_DIGITAL_BIT = 5;
+  public static final int DEFAULT_DECIMAL_BIT = 2;
+  public static final int DEFAULT_DURATION = 200;
+  private int digitalBit;//总位数
+  private int decimalBit;//小数点后几位
+  private long duration;
   private boolean showZeros = false;
 
   private DigitalItemView[] mChildren;
 
   public DigitalView(Context context) {
     super(context);
-    initChildren(context, R.drawable.digital_img, DEFAULT_BIT);
+    init(context, R.drawable.digital_img, DEFAULT_DIGITAL_BIT, DEFAULT_DECIMAL_BIT,
+        DEFAULT_DURATION);
   }
 
   public DigitalView(Context context, AttributeSet attrs) {
     super(context, attrs);
     TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.DigitalView);
-    int bit = a.getInt(R.styleable.DigitalView_bit, DEFAULT_BIT);
+    int bit = a.getInt(R.styleable.DigitalView_bit, DEFAULT_DIGITAL_BIT);
+    int decimalBit = a.getInt(R.styleable.DigitalView_decimal_bit, DEFAULT_DECIMAL_BIT);
     int resId = a.getResourceId(R.styleable.DigitalView_digital_img, R.drawable.digital_img);
-    mDuration = a.getResourceId(R.styleable.DigitalView_animate_duration, 200);
-    initChildren(context, resId, bit);
+    long duration = a.getResourceId(R.styleable.DigitalView_animate_duration, 200);
+    init(context, resId, bit, decimalBit, duration);
   }
 
-  private void initChildren(Context context, int resId, int bit) {
+  private void init(Context context, int resId, int bit, int decimalBit, long duration) {
     Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), resId);
     LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT, bitmap.getHeight() / 11);
-    mDigitalBit = bit;
+    this.digitalBit = bit;
+    this.decimalBit = decimalBit;
+    this.duration = duration;
     mChildren = new DigitalItemView[bit];
-    for (int i = 0; i < mDigitalBit; i++) {
-      mChildren[mDigitalBit - 1 - i] = new DigitalItemView(context, bitmap, mDuration);
-      addView(mChildren[mDigitalBit - 1 - i], i, params);
+    for (int i = 0; i < digitalBit; i++) {
+      mChildren[digitalBit - 1 - i] = new DigitalItemView(context, bitmap, this.duration);
+      addView(mChildren[digitalBit - 1 - i], i, params);
     }
     setDigital((long) 0);
   }
 
   public void setDigital(long digital) {
     int log10 = Math.max(0, (int) Math.log10(digital));
-    // 不显示前面的零
-    showBeforeZeros(log10);
-    // 显示整数部分（除个位数）
+    for (int i = digitalBit - 1; i > log10; i--) {
+      mChildren[i].setVisibility(View.GONE);
+    }
     for (int i = log10; i > 0; i--) {
       int base = (int) Math.pow(10, i);
       int temp = (int) (digital / base);
@@ -55,50 +65,42 @@ public class DigitalView extends LinearLayout {
       mChildren[i].setVisibility(View.VISIBLE);
       mChildren[i].setDigital(temp);
     }
-
-    // 显示个位数，即使个位数为零，也要显示出来。
     mChildren[0].setVisibility(View.VISIBLE);
     mChildren[0].setDigital((int) (digital % 10));
   }
 
-  private void showBeforeZeros(int log10) {
-    if (!showZeros) {
-      for (int i = mDigitalBit - 1; i > log10; i--) {
-        mChildren[i].setVisibility(View.GONE);
-      }
+  public void setDigital(double digital) throws Exception {
+    long digitalLong = (long) digital;
+    if (String.valueOf(digitalLong).length() > digitalBit - decimalBit - 1) {
+      throw new RuntimeException("Expect a decimal point based on your config!");
     }
-  }
-
-  public void setDigital(double fdigital) {
-    long digital = (long) fdigital;
-    int log10 = Math.max(0, (int) Math.log10(digital));
-    showBeforeZeros(log10);
-
-    for (int i = log10 + 3; i >= 4; i--) {
-      int base = (int) Math.pow(10, i - 3);
-      int temp = (int) (digital / base);
-      digital = (int) (digital % base);
-
+    int log10 = Math.max(0, (int) Math.log10(digitalLong));
+    for (int i = digitalBit - 1, n = log10 + decimalBit + 1; i > n; i--) {
+      mChildren[i].setVisibility(View.GONE);
+    }
+    int lastPos = log10 + decimalBit + 1;
+    int pointPos = decimalBit;
+    for (int i = lastPos; i >= pointPos + 2; i--) {
+      Log.d(TAG, "pointPos=" + pointPos + ",i=" + i);
+      int base = (int) Math.pow(10, i - decimalBit - 1);
+      int temp = (int) (digitalLong / base);
+      digitalLong = (int) (digitalLong % base);
       mChildren[i].setVisibility(View.VISIBLE);
       mChildren[i].setDigital(temp);
     }
 
-    // 显示个位数
-    mChildren[3].setVisibility(View.VISIBLE);
-    mChildren[3].setDigital((int) (digital % 10));
+    mChildren[decimalBit + 1].setVisibility(View.VISIBLE);
+    mChildren[decimalBit + 1].setDigital((int) (digitalLong % 10));
 
-    // 显示小数点
-    mChildren[2].setVisibility(VISIBLE);
-    mChildren[2].setDigital(10);
+    mChildren[decimalBit].setVisibility(VISIBLE);
+    mChildren[decimalBit].setDigital(10);
 
-    // 显示小数部分
-    //        fdigital = fdigital - Math.floor(fdigital);
-    //        digital = (long) (fdigital * 100);
-    digital = (long) (fdigital * 100 % 100);
-    for (int i = 1; i >= 0; i--) {
-      int basee = (int) Math.pow(10, i);
-      int temp = (int) (digital / basee);
-      digital = (int) (digital % basee);
+    double total = Math.pow(10, decimalBit);
+    digitalLong = (long) (digital * total % total);
+    for (int i = decimalBit - 1; i >= 0; i--) {
+      int base = (int) Math.pow(10, i);
+      int temp = (int) (digitalLong / base);
+      digitalLong = (int) (digitalLong % base);
 
       mChildren[i].setVisibility(View.VISIBLE);
       mChildren[i].setDigital(temp);
