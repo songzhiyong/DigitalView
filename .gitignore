@@ -29,9 +29,6 @@ local.properties
 .classpath
 .project
 
-# Windows thumbnail db
-.DS_Store
-
 # IDEA/Android Studio project files, because
 # the project can be imported from settings.gradle
 .idea
@@ -44,8 +41,6 @@ local.properties
 # Local IDEA workspace
 .idea/workspace.xml
 
-# Gradle cache
-.gradle
 
 # Sandbox stuff
 _sandbox
