@@ -7,12 +7,14 @@ import android.text.TextWatcher;
 import android.widget.EditText;
 
 public class MainActivity extends ActionBarActivity {
+  private static final String TAG = "MainActivity";
+  private DigitalView mDigital;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
-    final DigitalView digital = (DigitalView) findViewById(R.id.digital);
+    mDigital = (DigitalView) findViewById(R.id.digital);
     final EditText edit = (EditText) findViewById(R.id.edittext);
     edit.addTextChangedListener(new TextWatcher() {
       @Override public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
@@ -22,14 +24,14 @@ public class MainActivity extends ActionBarActivity {
       }
 
       @Override public void afterTextChanged(Editable editable) {
-        Double number = null;
+        Long number = null;
         try {
-          number = Double.valueOf(edit.getText().toString());
+          number = Long.valueOf(edit.getText().toString());
         } catch (NumberFormatException e) {
           e.printStackTrace();
-          number = (double) 0;
+          number = (long) 0;
         }
-        digital.setDigital(number);
+        mDigital.setDigital(number);
       }
     });
   }

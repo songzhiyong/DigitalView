@@ -15,6 +15,7 @@ import android.widget.ScrollView;
 public class DigitalItemView extends ScrollView {
   private static final String TAG = "DigitalItemView";
   protected int mDigital = 0;
+  protected long mSwitchDuration = 200;
 
   private ImageView mImageView;
 
@@ -30,8 +31,9 @@ public class DigitalItemView extends ScrollView {
     super(context, attrs, defStyle);
   }
 
-  public DigitalItemView(Context context, Bitmap bitmap) {
+  public DigitalItemView(Context context, Bitmap bitmap, long duration) {
     super(context);
+    mSwitchDuration = duration;
     setDigitalBitmap(bitmap);
   }
 
@@ -56,7 +58,7 @@ public class DigitalItemView extends ScrollView {
           new TranslateAnimation(Animation.ABSOLUTE, 0, Animation.ABSOLUTE, 0,
               Animation.RELATIVE_TO_SELF, -mDigital / 11.0f, Animation.RELATIVE_TO_SELF,
               -digital / 11.0f);
-      transAnim.setDuration(300);
+      transAnim.setDuration(mSwitchDuration);
       transAnim.setFillBefore(true);
       transAnim.setFillAfter(true);
       mImageView.startAnimation(transAnim);

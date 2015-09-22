@@ -9,25 +9,25 @@ import android.view.View;
 import android.widget.LinearLayout;
 
 public class DigitalView extends LinearLayout {
+  public static final int DEFAULT_BIT = 5;
   private int mDigitalBit;
+  private long mDuration;
+  private boolean showZeros = false;
 
   private DigitalItemView[] mChildren;
 
   public DigitalView(Context context) {
     super(context);
-    initChildren(context, R.drawable.digital_img, 1);
+    initChildren(context, R.drawable.digital_img, DEFAULT_BIT);
   }
 
   public DigitalView(Context context, AttributeSet attrs) {
     super(context, attrs);
     TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.DigitalView);
-    int bit = a.getInt(R.styleable.DigitalView_bit, 13);
-    int resId = a.getResourceId(R.styleable.DigitalView_digitalImg, R.drawable.digital_img);
+    int bit = a.getInt(R.styleable.DigitalView_bit, DEFAULT_BIT);
+    int resId = a.getResourceId(R.styleable.DigitalView_digital_img, R.drawable.digital_img);
+    mDuration = a.getResourceId(R.styleable.DigitalView_animate_duration, 200);
     initChildren(context, resId, bit);
-  }
-
-  public int getDigitalBit() {
-    return mDigitalBit;
   }
 
   private void initChildren(Context context, int resId, int bit) {
@@ -36,19 +36,16 @@ public class DigitalView extends LinearLayout {
     mDigitalBit = bit;
     mChildren = new DigitalItemView[bit];
     for (int i = 0; i < mDigitalBit; i++) {
-      mChildren[mDigitalBit - 1 - i] = new DigitalItemView(context, bitmap);
+      mChildren[mDigitalBit - 1 - i] = new DigitalItemView(context, bitmap, mDuration);
       addView(mChildren[mDigitalBit - 1 - i], i, params);
     }
-    setDigital(0.0);
+    setDigital((long) 0);
   }
 
   public void setDigital(long digital) {
     int log10 = Math.max(0, (int) Math.log10(digital));
     // 不显示前面的零
-    for (int i = mDigitalBit - 1; i > log10; i--) {
-      mChildren[i].setVisibility(View.GONE);
-    }
-
+    showBeforeZeros(log10);
     // 显示整数部分（除个位数）
     for (int i = log10; i > 0; i--) {
       int base = (int) Math.pow(10, i);
@@ -64,16 +61,19 @@ public class DigitalView extends LinearLayout {
     mChildren[0].setDigital((int) (digital % 10));
   }
 
+  private void showBeforeZeros(int log10) {
+    if (!showZeros) {
+      for (int i = mDigitalBit - 1; i > log10; i--) {
+        mChildren[i].setVisibility(View.GONE);
+      }
+    }
+  }
+
   public void setDigital(double fdigital) {
     long digital = (long) fdigital;
     int log10 = Math.max(0, (int) Math.log10(digital));
+    showBeforeZeros(log10);
 
-    // 不显示前面的零
-    for (int i = mDigitalBit - 1, n = log10 + 3; i > n; i--) {
-      mChildren[i].setVisibility(View.GONE);
-    }
-
-    // 显示整数部分（除个位数和小数）
     for (int i = log10 + 3; i >= 4; i--) {
       int base = (int) Math.pow(10, i - 3);
       int temp = (int) (digital / base);
