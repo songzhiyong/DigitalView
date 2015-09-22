@@ -3,6 +3,7 @@ package me.ziso.digitalview;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.animation.Animation;
@@ -12,6 +13,7 @@ import android.widget.ImageView.ScaleType;
 import android.widget.ScrollView;
 
 public class DigitalItemView extends ScrollView {
+  private static final String TAG = "DigitalItemView";
   protected int mDigital = 0;
 
   private ImageView mImageView;
@@ -48,6 +50,8 @@ public class DigitalItemView extends ScrollView {
 
   public void setDigital(int digital) {
     if (digital >= 0 && digital <= 10 && mDigital != digital) {
+      Log.d(TAG, "fromY=" + (-mDigital / 11.0f));
+      Log.d(TAG, "toY=" + (-digital / 11.0f));
       TranslateAnimation transAnim =
           new TranslateAnimation(Animation.ABSOLUTE, 0, Animation.ABSOLUTE, 0,
               Animation.RELATIVE_TO_SELF, -mDigital / 11.0f, Animation.RELATIVE_TO_SELF,

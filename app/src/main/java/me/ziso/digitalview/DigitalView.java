@@ -9,22 +9,20 @@ import android.view.View;
 import android.widget.LinearLayout;
 
 public class DigitalView extends LinearLayout {
-  private int mDigitalBit;     // 数字的位数：double数值类型包含小数点和小数位
+  private int mDigitalBit;
 
   private DigitalItemView[] mChildren;
 
   public DigitalView(Context context) {
     super(context);
-
-    initChildren(context, R.drawable.number_money, 1);
+    initChildren(context, R.drawable.digital_img, 1);
   }
 
   public DigitalView(Context context, AttributeSet attrs) {
     super(context, attrs);
-
     TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.DigitalView);
     int bit = a.getInt(R.styleable.DigitalView_bit, 13);
-    int resId = a.getResourceId(R.styleable.DigitalView_digitalImg, R.drawable.number_money);
+    int resId = a.getResourceId(R.styleable.DigitalView_digitalImg, R.drawable.digital_img);
     initChildren(context, resId, bit);
   }
 
@@ -46,7 +44,6 @@ public class DigitalView extends LinearLayout {
 
   public void setDigital(long digital) {
     int log10 = Math.max(0, (int) Math.log10(digital));
-
     // 不显示前面的零
     for (int i = mDigitalBit - 1; i > log10; i--) {
       mChildren[i].setVisibility(View.GONE);
