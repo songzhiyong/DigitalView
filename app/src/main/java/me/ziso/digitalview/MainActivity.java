@@ -4,12 +4,13 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity implements View.OnFocusChangeListener {
   private static final String TAG = "MainActivity";
-  private DigitalView mDigital;
+  private DigitalView digitalView;
 
   private EditText editLong;
   private EditText editDouble;
@@ -18,8 +19,9 @@ public class MainActivity extends ActionBarActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
-    mDigital = (DigitalView) findViewById(R.id.digital);
+    digitalView = (DigitalView) findViewById(R.id.digital);
     editLong = (EditText) findViewById(R.id.edittext_long);
+    editLong.setOnFocusChangeListener(this);
     editLong.addTextChangedListener(new TextWatcher() {
       @Override public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
       }
@@ -35,10 +37,11 @@ public class MainActivity extends ActionBarActivity {
           e.printStackTrace();
           number = (long) 0;
         }
-        mDigital.setDigital(number);
+        digitalView.setDigital(number);
       }
     });
     editDouble = (EditText) findViewById(R.id.edittext_double);
+    editDouble.setOnFocusChangeListener(this);
     editDouble.addTextChangedListener(new TextWatcher() {
       String lastString = "";
 
@@ -57,7 +60,7 @@ public class MainActivity extends ActionBarActivity {
           number = (double) 0;
         }
         try {
-          mDigital.setDigital(number);
+          digitalView.setDigital(number);
         } catch (Exception e) {
           Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
           editDouble.setText(lastString);
@@ -66,5 +69,25 @@ public class MainActivity extends ActionBarActivity {
         editDouble.setSelection(lastString.length());
       }
     });
+  }
+
+  @Override public void onFocusChange(View view, boolean b) {
+    if (b) {
+
+      switch (view.getId()) {
+        case R.id.edittext_long:
+          digitalView.setDigital((long) 0);
+          break;
+        case R.id.edittext_double:
+          String lastString = editDouble.getText().toString();
+          try {
+            digitalView.setDigital((double) 0);
+          } catch (Exception e) {
+            Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+            editDouble.setText(lastString);
+          }
+          break;
+      }
+    }
   }
 }

@@ -17,8 +17,8 @@
       android:layout_height="wrap_content"
       android:layout_gravity="center"
       app:bit="5"
-      app:decimal_bit="3"
-      app:animate_duration="100"
+      app:decimal_bit="2"
+      app:animate_duration="200"
       />
   <LinearLayout
       android:layout_width="match_parent"
