@@ -18,7 +18,6 @@ public class DigitalView extends LinearLayout {
   private int digitalBit;//总位数
   private int decimalBit;//小数点后几位
   private long duration;
-  private boolean showZeros = false;
 
   private DigitalItemView[] mChildren;
 
@@ -34,7 +33,7 @@ public class DigitalView extends LinearLayout {
     int bit = a.getInt(R.styleable.DigitalView_bit, DEFAULT_DIGITAL_BIT);
     int decimalBit = a.getInt(R.styleable.DigitalView_decimal_bit, DEFAULT_DECIMAL_BIT);
     int resId = a.getResourceId(R.styleable.DigitalView_digital_img, R.drawable.digital_img);
-    long duration = a.getResourceId(R.styleable.DigitalView_animate_duration, 200);
+    long duration = a.getInt(R.styleable.DigitalView_animate_duration, DEFAULT_DURATION);
     init(context, resId, bit, decimalBit, duration);
   }
 
