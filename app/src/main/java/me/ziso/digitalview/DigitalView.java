@@ -71,7 +71,7 @@ public class DigitalView extends LinearLayout {
   public void setDigital(double digital) throws Exception {
     long digitalLong = (long) digital;
     if (String.valueOf(digitalLong).length() > digitalBit - decimalBit - 1) {
-      throw new RuntimeException("Expect a decimal point based on your config!");
+      throw new IllegalArgumentException("Expect a decimal point based on your config!");
     }
     int log10 = Math.max(0, (int) Math.log10(digitalLong));
     for (int i = digitalBit - 1, n = log10 + decimalBit + 1; i > n; i--) {
